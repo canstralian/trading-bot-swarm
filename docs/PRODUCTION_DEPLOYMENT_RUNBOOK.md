@@ -1,159 +1,595 @@
 # Production Deployment Runbook
 
 ## Overview
-This runbook provides a comprehensive guide for deploying the Trading Bot Swarm system to production. The system consists of a multi-bot MCP orchestrator with Flask-based APIs, React frontend, and PostgreSQL database.
 
-## Pre-Release Preparations
+This runbook provides comprehensive guidance for deploying the Trading Bot Swarm system to production environments. It covers all stages from pre-release preparations through post-deployment monitoring and continuous improvement.
 
-### Code Review and Security Audit
-- Conduct thorough code reviews for all changes.
-- Perform security audits focusing on:
-  - Input validation in Flask endpoints.
-  - API authentication and authorization.
-  - Database query sanitization to prevent SQL injection.
-  - Secure handling of sensitive data (e.g., API keys, trading credentials).
+**Target Audience:** DevOps Engineers, Site Reliability Engineers, Release Managers
 
-### Dependency Updates
-- Update all Python dependencies to latest secure versions using `pip-audit`.
-- Run `npm audit` to identify vulnerabilities, then apply controlled, pinned dependency updates. Prefer manual updates with CI validation, or use automated scanners (e.g., Dependabot, Snyk) with review gates. Avoid using `npm audit fix` directly, as it can introduce breaking upgrades; if necessary, use `npm audit fix --only=prod` for production dependencies only.
-- Ensure PostgreSQL version is up-to-date and compatible.
-
-### Configuration Management
-- Prepare environment-specific configuration files:
-  - Production database connection strings.
-  - Secure API keys and secrets (use environment variables or secret managers).
-  - Logging configurations.
-- Validate configurations against security best practices.
-
-### Backup and Data Migration
-- Create database backups before deployment.
-- **Verify backup restorability:** Perform a backup restore test by restoring the latest backup in the staging environment before deployment. Periodically conduct restore drills to ensure backup integrity.
-- Plan for data migrations if schema changes are involved.
-- Test migration scripts in staging environment.
-
-## Testing
-
-### Unit and Integration Tests
-- Run full test suite: `pytest` for Python backend, `npm test` for React frontend.
-- Ensure all tests pass, including API integration tests.
-- Validate database operations under load.
-
-### Security Testing
-- Perform vulnerability scanning with tools like OWASP ZAP.
-- Test for common web vulnerabilities (XSS, CSRF) in Flask routes.
-- Review API rate limiting and CORS configurations.
-
-### Performance Testing
-- Conduct load testing simulating trading bot operations.
-- Monitor resource usage (CPU, memory, network).
-- Ensure PostgreSQL queries are optimized and indexed.
-
-### Staging Deployment
-- Deploy to staging environment mirroring production.
-- Run end-to-end tests including bot orchestration scenarios.
-- Validate data consistency and API responses.
-
-## Deployment Steps
-
-### Infrastructure Preparation
-- Provision or update cloud resources (e.g., EC2 instances, RDS PostgreSQL).
-- Configure load balancers and auto-scaling groups.
-- Set up monitoring and logging services (e.g., CloudWatch, ELK stack).
-
-### Application Deployment
-1. Build Docker images for Flask app and React frontend.
-2. Push images to secure container registry.
-3. Update deployment manifests (e.g., Kubernetes YAML or Docker Compose).
-4. Deploy to production environment using CI/CD pipeline (e.g., GitHub Actions, Jenkins) with a safe rollout strategy:
-   - **Choose a rollout strategy:** Use canary, blue/green, or rolling deployment to minimize blast radius.
-   - **Canary deployment example:** Route a small percentage of traffic (e.g., 5–10%) to the new version initially.
-   - **Automated smoke tests:** Run automated smoke tests against the canary/blue environment to validate core functionality (API health, trading bot orchestration, database connectivity).
-   - **Approval gates:** Require manual approval from the team before promoting the deployment to 100% traffic.
-   - **Monitor:** Continuously monitor application metrics and error rates during rollout. Roll back if issues are detected.
-
-### Database Deployment
-- Apply schema migrations safely:
-  - Run migrations inside transactions where supported to ensure atomicity and easy rollback.
-  - Use the expand-and-contract pattern for backward-compatible, zero-downtime schema changes (e.g., add new columns/tables, migrate data, then remove old columns).
-  - Ensure migration scripts are idempotent so they can be safely re-run.
-  - Perform a dry-run of migrations in staging to validate changes and catch errors.
-  - Document and prepare a clear rollback procedure in case migrations fail (e.g., restore from backup, revert schema changes).
-- Update connection strings in application configs.
-- Verify database connectivity from application servers.
-
-### Post-Deployment Validation
-- Confirm application startup logs.
-- Check health endpoints.
-- Validate frontend accessibility.
-
-## Health Checks
-
-### Automated Health Checks
-- Implement a minimal `/health` endpoint in the Flask app that returns basic liveness status (e.g., "OK") with no sensitive details.
-- Move dependency checks (e.g., database connectivity, bot orchestration processes) to a `/ready` endpoint, which should be restricted to internal networks or require authentication.
-- Avoid returning detailed error messages or configuration values in health responses.
-
-### Manual Verification
-- Access application dashboard.
-- Verify trading bot statuses.
-- Check log files for errors.
-
-## Monitoring
-
-### Application Monitoring
-- Set up application performance monitoring (APM) with tools like New Relic or DataDog.
-- Monitor API response times, error rates, and throughput.
-- Track custom metrics for bot performance (e.g., trades executed, profit/loss).
-
-### Infrastructure Monitoring
-- Monitor server resources (CPU, memory, disk).
-- Set up alerts for high usage or failures.
-- Track network latency and availability.
-
-### Logging
-- Centralize logs using ELK stack or CloudWatch.
-- Implement structured logging in Flask app.
-- Set up log rotation and retention policies.
-
-### Security Monitoring
-- Monitor for unauthorized access attempts.
-- Set up alerts for suspicious activities (e.g., unusual API calls).
-- Regularly review access logs.
-
-## Rollback
-
-### Rollback Plan
-- Maintain previous deployment artifacts (Docker images, configs).
-- Document rollback steps for each component.
-
-### Execution
-1. Stop current deployment.
-2. Roll back to previous stable version.
-3. Restore database if necessary (from backups).
-4. Restart services and validate health.
-
-### Communication
-- Notify stakeholders of rollback.
-- Document incident and lessons learned.
-
-## Continuous Improvement
-
-### Post-Mortem Reviews
-- Conduct post-deployment reviews.
-- Identify areas for improvement in processes or code.
-
-### Automation Enhancements
-- Implement more automated testing and deployment steps.
-- Refine CI/CD pipelines for faster, safer deployments.
-
-### Security Updates
-- Regularly update dependencies and apply security patches.
-- Incorporate security best practices into development workflow.
-
-### Performance Optimization
-- Analyze monitoring data to identify bottlenecks.
-- Optimize code and infrastructure based on insights.
+**Last Updated:** 2025-10-15
 
 ---
 
-This runbook ensures secure, reliable deployments of the Trading Bot Swarm system, prioritizing security, testing, and monitoring throughout the process.
+## Table of Contents
+
+1. [Pre-Release Preparations](#pre-release-preparations)
+2. [Testing](#testing)
+3. [Deployment Steps](#deployment-steps)
+4. [Health Checks](#health-checks)
+5. [Monitoring](#monitoring)
+6. [Rollback Procedures](#rollback-procedures)
+7. [Continuous Improvement](#continuous-improvement)
+
+---
+
+## Pre-Release Preparations
+
+### 1.1 Code Review and Approval
+
+- [ ] All pull requests have been reviewed and approved by at least two team members
+- [ ] Code changes have passed security scanning (SAST/DAST)
+- [ ] All merge conflicts have been resolved
+- [ ] Release notes have been prepared and reviewed
+
+### 1.2 Environment Verification
+
+- [ ] Verify production environment credentials are valid and accessible
+- [ ] Confirm database backup schedule is current
+- [ ] Ensure adequate disk space and resources are available
+- [ ] Verify SSL/TLS certificates are valid and not expiring within 30 days
+- [ ] Check that all external API keys and secrets are properly configured
+
+### 1.3 Dependency Management
+
+- [ ] All dependencies are up-to-date and vulnerability-free
+- [ ] Third-party API integrations are tested and operational
+- [ ] Trading exchange API connections are stable
+- [ ] Database migration scripts are prepared and tested
+
+### 1.4 Communication
+
+- [ ] Notify stakeholders of planned deployment window
+- [ ] Create incident response channel (Slack/Teams/Discord)
+- [ ] Prepare rollback communication templates
+- [ ] Schedule post-deployment review meeting
+
+### 1.5 Backup and Recovery
+
+- [ ] Create full database backup
+- [ ] Export current configuration files
+- [ ] Document current system state (versions, configurations)
+- [ ] Verify backup restoration process is working
+- [ ] Tag current production release in version control
+
+---
+
+## Testing
+
+### 2.1 Pre-Deployment Testing
+
+#### Unit Tests
+```bash
+# Run unit tests
+npm test
+# or
+pytest tests/unit/
+
+# Verify all tests pass
+# Coverage should be > 80%
+```
+
+#### Integration Tests
+```bash
+# Run integration tests
+npm run test:integration
+# or
+pytest tests/integration/
+
+# Verify bot-to-bot communication
+# Verify exchange API integrations
+# Verify database operations
+```
+
+#### End-to-End Tests
+```bash
+# Run E2E tests in staging
+npm run test:e2e
+# or
+pytest tests/e2e/
+
+# Test complete trading workflows
+# Verify order placement and cancellation
+# Test portfolio management
+```
+
+### 2.2 Staging Environment Testing
+
+- [ ] Deploy to staging environment
+- [ ] Run smoke tests on staging
+- [ ] Perform load testing with production-like data
+- [ ] Execute security penetration tests
+- [ ] Validate monitoring and alerting systems
+- [ ] Test rollback procedures in staging
+
+### 2.3 Performance Testing
+
+- [ ] Load test with expected production volume
+- [ ] Stress test with 2x expected volume
+- [ ] Monitor resource utilization under load
+- [ ] Verify autoscaling triggers work correctly
+- [ ] Test rate limiting and throttling mechanisms
+
+### 2.4 Security Testing
+
+- [ ] Run vulnerability scans
+- [ ] Verify authentication and authorization
+- [ ] Test API key rotation procedures
+- [ ] Validate encrypted data storage
+- [ ] Check audit logging functionality
+
+---
+
+## Deployment Steps
+
+### 3.1 Pre-Deployment Checklist
+
+- [ ] Confirm maintenance window start time
+- [ ] Set deployment status page to "maintenance mode"
+- [ ] Disable automated trading bots
+- [ ] Stop all background jobs and cron tasks
+- [ ] Create snapshot of production environment
+
+### 3.2 Deployment Process
+
+#### Step 1: Enable Maintenance Mode
+```bash
+# Stop trading operations gracefully
+./scripts/stop-trading.sh
+
+# Enable maintenance mode
+./scripts/enable-maintenance.sh
+```
+
+#### Step 2: Database Migration
+```bash
+# Backup database
+./scripts/backup-db.sh
+
+# Run migrations
+./scripts/migrate-db.sh
+
+# Verify migration success
+./scripts/verify-migration.sh
+```
+
+#### Step 3: Application Deployment
+```bash
+# Pull latest code
+git fetch origin
+git checkout tags/v<version>
+
+# Install dependencies (use modern npm flag to exclude dev dependencies)
+npm ci --omit=dev
+# or
+pip install -r requirements.txt
+
+# Build application
+npm run build
+# or (use modern pip-based installation instead of deprecated setup.py install)
+pip install .
+```
+
+#### Step 4: Configuration Update
+```bash
+# Update environment variables
+cp .env.production .env
+
+# Verify configuration
+./scripts/verify-config.sh
+
+# Update feature flags
+./scripts/update-feature-flags.sh
+```
+
+#### Step 5: Service Restart
+```bash
+# Restart application services
+systemctl restart trading-bot-swarm
+
+# or for containerized deployments (use modern docker compose command)
+docker compose down
+docker compose up -d
+
+# or for Kubernetes
+kubectl rollout restart deployment/trading-bot-swarm
+kubectl rollout status deployment/trading-bot-swarm
+```
+
+#### Step 6: Smoke Tests
+```bash
+# Run post-deployment smoke tests
+./scripts/smoke-tests.sh
+
+# Verify critical paths
+curl -f https://api.yourdomain.com/health || exit 1
+```
+
+### 3.3 Post-Deployment Verification
+
+- [ ] Verify all services are running
+- [ ] Check application logs for errors
+- [ ] Test critical user journeys
+- [ ] Verify database connectivity
+- [ ] Test external API integrations
+- [ ] Confirm monitoring dashboards are updating
+
+### 3.4 Enable Production Traffic
+
+```bash
+# Disable maintenance mode
+./scripts/disable-maintenance.sh
+
+# Enable trading bots gradually
+./scripts/enable-trading.sh --gradual
+
+# Monitor for 15 minutes before full enablement
+```
+
+---
+
+## Health Checks
+
+### 4.1 Application Health
+
+#### Basic Health Check
+```bash
+# Check application endpoint
+curl https://api.yourdomain.com/health
+
+# Expected response:
+# {"status": "healthy", "timestamp": "2025-10-15T17:37:53Z"}
+```
+
+#### Detailed Health Check
+```bash
+# Check component health
+curl https://api.yourdomain.com/health/detailed
+
+# Verify:
+# - Database connection: OK
+# - Cache connection: OK
+# - Message queue: OK
+# - External APIs: OK
+```
+
+### 4.2 Infrastructure Health
+
+- [ ] CPU utilization < 70%
+- [ ] Memory utilization < 80%
+- [ ] Disk usage < 85%
+- [ ] Network latency < 100ms
+- [ ] Database response time < 50ms
+
+### 4.3 Trading System Health
+
+- [ ] Bot coordination working
+- [ ] Order execution functioning
+- [ ] Portfolio sync operational
+- [ ] Risk management active
+- [ ] Market data feeds connected
+
+### 4.4 Monitoring Dashboards
+
+Access the following dashboards to verify system health:
+
+- **Application Dashboard**: Monitor application metrics, request rates, error rates
+- **Infrastructure Dashboard**: Monitor server resources, network, storage
+- **Trading Dashboard**: Monitor trading activity, positions, PnL
+- **Security Dashboard**: Monitor authentication, authorization, suspicious activity
+
+---
+
+## Monitoring
+
+### 5.1 Key Performance Indicators (KPIs)
+
+#### Application Metrics
+- Request rate (requests/second)
+- Response time (p50, p95, p99)
+- Error rate (%)
+- Active connections
+- Queue depth
+
+#### Trading Metrics
+- Order success rate
+- Order latency
+- Slippage
+- Position count
+- Profit/Loss (PnL)
+
+#### Infrastructure Metrics
+- CPU utilization (%)
+- Memory usage (GB)
+- Disk I/O (IOPS)
+- Network throughput (Mbps)
+- Database connections
+
+### 5.2 Alert Thresholds
+
+#### Critical Alerts (Page immediately)
+- Application down (no response to health checks)
+- Database connection failure
+- Security breach detected
+- Trading losses exceed threshold
+- Exchange API connectivity lost
+
+#### High Priority Alerts (Notify within 5 minutes)
+- Error rate > 5%
+- Response time > 1000ms (p95)
+- CPU utilization > 85%
+- Memory utilization > 90%
+- Disk space < 10%
+
+#### Medium Priority Alerts (Notify within 15 minutes)
+- Error rate > 2%
+- Response time > 500ms (p95)
+- Increased order latency
+- Cache miss rate high
+- Unusual trading patterns
+
+### 5.3 Log Monitoring
+
+#### Application Logs
+```bash
+# View real-time logs
+tail -f /var/log/trading-bot-swarm/app.log
+
+# Search for errors
+grep ERROR /var/log/trading-bot-swarm/app.log
+
+# For containerized deployments
+docker logs -f trading-bot-swarm
+# or (add namespace flag for clarity in multi-namespace clusters)
+kubectl logs -n <namespace> -f deployment/trading-bot-swarm
+```
+
+#### Key Log Patterns to Monitor
+- ERROR: Critical application errors
+- WARN: Warning conditions that may need attention
+- FATAL: System failures requiring immediate action
+- Exception stack traces
+- Trading order failures
+- API rate limit warnings
+
+### 5.4 Third-Party Integrations
+
+- [ ] Configure Datadog/New Relic/Prometheus for metrics
+- [ ] Set up PagerDuty/Opsgenie for on-call rotation
+- [ ] Enable Sentry/Rollbar for error tracking
+- [ ] Configure log aggregation (ELK/Splunk)
+- [ ] Set up APM (Application Performance Monitoring)
+
+---
+
+## Rollback Procedures
+
+### 6.1 When to Rollback
+
+Initiate rollback if:
+- Critical functionality is broken
+- Data corruption is detected
+- Security vulnerability is exploited
+- System performance degrades significantly
+- Trading losses exceed acceptable threshold
+- More than 5% error rate persists for > 5 minutes
+
+### 6.2 Rollback Process
+
+#### Step 1: Immediate Actions
+```bash
+# Stop all trading activity
+./scripts/emergency-stop.sh
+
+# Enable maintenance mode
+./scripts/enable-maintenance.sh
+
+# Notify stakeholders
+./scripts/notify-incident.sh "ROLLBACK_INITIATED"
+```
+
+#### Step 2: Rollback Application
+```bash
+# Revert to previous version
+git checkout tags/v<previous-version>
+
+# Rollback containerized deployment (use modern docker compose command)
+docker compose down
+docker compose -f docker-compose.previous.yml up -d
+
+# or for Kubernetes
+kubectl rollout undo deployment/trading-bot-swarm
+kubectl rollout status deployment/trading-bot-swarm
+```
+
+#### Step 3: Rollback Database
+```bash
+# Only if database changes are incompatible
+./scripts/rollback-db.sh
+
+# Restore from backup if needed
+./scripts/restore-db.sh <backup-timestamp>
+```
+
+#### Step 4: Verification
+```bash
+# Run health checks
+./scripts/health-check.sh
+
+# Verify critical functionality
+./scripts/smoke-tests.sh
+
+# Check logs for errors
+./scripts/check-logs.sh
+```
+
+#### Step 5: Resume Operations
+```bash
+# Disable maintenance mode
+./scripts/disable-maintenance.sh
+
+# Re-enable trading gradually
+./scripts/enable-trading.sh --gradual
+
+# Monitor closely for 30 minutes
+```
+
+### 6.3 Post-Rollback Actions
+
+- [ ] Document rollback reason and timeline
+- [ ] Conduct incident retrospective
+- [ ] Update rollback procedures based on learnings
+- [ ] Create bug tickets for issues found
+- [ ] Communicate status to stakeholders
+
+### 6.4 Rollback Testing
+
+- [ ] Test rollback procedure quarterly in staging
+- [ ] Document rollback time (target: < 15 minutes)
+- [ ] Verify data consistency after rollback
+- [ ] Update runbook based on test results
+
+---
+
+## Continuous Improvement
+
+### 7.1 Post-Deployment Review
+
+Schedule a review meeting within 24 hours of deployment to discuss:
+
+- What went well?
+- What could be improved?
+- Were there any unexpected issues?
+- Did we meet our deployment time targets?
+- Were all team members properly informed?
+
+### 7.2 Metrics and KPIs
+
+Track the following deployment metrics:
+
+- **Deployment Frequency**: How often we deploy
+- **Lead Time**: Time from commit to production
+- **Mean Time to Recovery (MTTR)**: Time to recover from failures
+- **Change Failure Rate**: Percentage of deployments causing issues
+- **Deployment Duration**: Time taken for each deployment
+
+### 7.3 Automation Opportunities
+
+Identify areas for automation:
+
+- [ ] Automated deployment pipeline (CI/CD)
+- [ ] Automated rollback triggers
+- [ ] Automated health checks and alerts
+- [ ] Automated performance testing
+- [ ] Automated security scanning
+- [ ] Infrastructure as Code (IaC)
+
+### 7.4 Documentation Updates
+
+- [ ] Update this runbook based on lessons learned
+- [ ] Document any new troubleshooting steps
+- [ ] Add new monitoring dashboards or alerts
+- [ ] Update architecture diagrams if changed
+- [ ] Review and update disaster recovery procedures
+
+### 7.5 Training and Knowledge Sharing
+
+- [ ] Share deployment experience with team
+- [ ] Update training materials
+- [ ] Conduct knowledge transfer sessions
+- [ ] Document tribal knowledge
+- [ ] Cross-train team members on deployment
+
+### 7.6 Security Improvements
+
+- [ ] Review access controls and permissions
+- [ ] Rotate API keys and credentials
+- [ ] Update security scanning tools
+- [ ] Review audit logs for anomalies
+- [ ] Conduct security training
+
+### 7.7 Process Improvements
+
+Regular review and improvement of:
+
+- Deployment checklist completeness
+- Communication effectiveness
+- Rollback procedure efficiency
+- Monitoring coverage and alert quality
+- Testing strategy comprehensiveness
+
+---
+
+## Appendix
+
+### A. Contact Information
+
+| Role | Name | Contact |
+|------|------|---------|
+| Release Manager | Alice Johnson | release@example.com |
+| DevOps Lead | Bob Smith | devops@example.com |
+| On-Call Engineer | Charlie Lee | oncall@example.com |
+| Security Team | Security Operations Team | security@example.com |
+
+### B. External Dependencies
+
+| Service | Purpose | Status Page |
+|---------|---------|-------------|
+| Trading Exchange APIs | Order execution | https://status.exchange.com |
+| Market Data Provider | Real-time data | https://status.marketdata.com |
+| Cloud Provider | Infrastructure | https://status.aws.amazon.com |
+
+### C. Useful Commands
+
+```bash
+# Check service status
+systemctl status trading-bot-swarm
+
+# View recent logs
+journalctl -u trading-bot-swarm -n 100
+
+# Check disk space
+df -h
+
+# Monitor system resources
+htop
+
+# Check database status
+systemctl status postgresql
+
+# Test network connectivity
+curl -v https://api.exchange.com/ping
+```
+
+### D. Emergency Contacts
+
+- **Production Incident**: Escalate to on-call rotation
+- **Security Incident**: security@example.com (24/7)
+- **Exchange Support**: support@exchange.com
+- **Cloud Support**: AWS Support Portal
+
+### E. Related Documents
+
+- [CI/CD Documentation](CI_CD.md)
+- [Contributing Guidelines](../CONTRIBUTING.md)
+- [Project README](../README.md)
+
+### F. Version History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 1.1 | 2025-10-15 | DevOps Team | Updated with modern tooling and best practices |
+| 1.0 | 2025-10-15 | DevOps Team | Initial version |
+
+---
+
+**Note**: This runbook is a living document and should be updated regularly based on deployment experiences and system changes. Review and update at least quarterly or after significant system changes.
