@@ -54,4 +54,23 @@ import pandas as pd
 from strategies.base_strategy import BaseStrategy
 
 class RsiMomentumStrategy(BaseStrategy):
-    # Let Copilot complete the rest...
+    def __init__(self, symbol, exchange):
+        super().__init__(symbol, exchange)
+        self.rsi_period = 14
+
+    def calculate_rsi(self, prices: pd.Series) -> float:
+        delta = prices.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=self.rsi_period).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=self.rsi_period).mean()
+        rs = gain / loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi.iloc[-1]
+
+    def generate_signal(self, prices: pd.Series) -> str:
+        rsi = self.calculate_rsi(prices)
+        if rsi < 30:
+            return "buy"
+        elif rsi > 70:
+            return "sell"
+        else:
+            return "hold"
