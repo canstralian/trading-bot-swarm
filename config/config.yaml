@@ -1,0 +1,169 @@
+# Main Configuration File for Trading Bot Swarm
+# Environment: development | production | testing
+
+environment: development
+
+# Database Configuration
+database:
+  sqlite:
+    path: "data/trading_bot.db"
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+  mongodb:
+    host: "localhost"
+    port: 27017
+    database: "trading_swarm"
+
+# Trading Configuration
+trading:
+  # Supported exchanges
+  exchanges:
+    binance:
+      enabled: true
+      api_key: ${BINANCE_API_KEY}
+      api_secret: ${BINANCE_API_SECRET}
+      sandbox: true
+      testnet: true
+    
+    alpaca:
+      enabled: false
+      api_key: ${ALPACA_API_KEY}
+      api_secret: ${ALPACA_API_SECRET}
+      base_url: "https://paper-api.alpaca.markets"
+  
+  # Risk Management
+  risk:
+    max_position_size: 0.1  # 10% of portfolio per position
+    max_daily_loss: 0.05    # 5% daily loss limit
+    stop_loss_percentage: 0.02  # 2% stop loss
+    take_profit_percentage: 0.04  # 4% take profit
+
+# Swarm Configuration
+swarm:
+  # Communication settings
+  communication:
+    protocol: "zmq"  # zmq | redis | websocket
+    port: 5555
+    heartbeat_interval: 30  # seconds
+    
+  # Node roles
+  roles:
+    master: true    # Is this node a master coordinator?
+    worker: true    # Can this node execute trades?
+    monitor: true   # Does this node monitor others?
+  
+  # Load balancing
+  load_balancing:
+    strategy: "round_robin"  # round_robin | least_connections | weighted
+    max_concurrent_trades: 5
+
+# Raspberry Pi Specific Settings
+raspberry_pi:
+  # Hardware monitoring
+  hardware:
+    cpu_temp_threshold: 70.0  # Celsius
+    memory_threshold: 80.0    # Percentage
+    gpio_pins:
+      status_led: 18
+      error_led: 19
+      activity_led: 20
+  
+  # Performance optimization
+  performance:
+    cpu_governor: "performance"
+    swap_usage_threshold: 50.0
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  files:
+    main: "logs/main.log"
+    trading: "logs/trading.log"
+    swarm: "logs/swarm.log"
+    errors: "logs/errors.log"
+  rotation:
+    max_size: "10MB"
+    backup_count: 5
+
+# Monitoring and Metrics
+monitoring:
+  prometheus:
+    enabled: true
+    port: 8000
+  
+  grafana:
+    enabled: false
+    dashboard_url: "http://localhost:3000"
+  
+  alerts:
+    email:
+      enabled: false
+      smtp_server: "smtp.gmail.com"
+      smtp_port: 587
+      username: ${EMAIL_USERNAME}
+      password: ${EMAIL_PASSWORD}
+      recipients: []
+
+# Strategy Configuration
+strategies:
+  default_strategy: "simple_moving_average"
+  
+  available_strategies:
+    - "simple_moving_average"
+    - "rsi_oversold"
+    - "bollinger_bands"
+    - "mean_reversion"
+    - "momentum"
+  
+  parameters:
+    simple_moving_average:
+      short_window: 10
+      long_window: 30
+    
+    rsi_oversold:
+      period: 14
+      oversold_threshold: 30
+      overbought_threshold: 70
+
+# Data Sources
+data:
+  sources:
+    primary: "binance"
+    backup: "yfinance"
+  
+  symbols:
+    crypto:
+      - "BTC/USDT"
+      - "ETH/USDT"
+      - "ADA/USDT"
+      - "DOT/USDT"
+    
+    stocks:
+      - "AAPL"
+      - "GOOGL"
+      - "TSLA"
+      - "MSFT"
+  
+  intervals:
+    - "1m"
+    - "5m"
+    - "15m"
+    - "1h"
+    - "1d"
+
+# Security Settings
+security:
+  api_rate_limits:
+    requests_per_minute: 100
+    burst_limit: 10
+  
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+  
+  authentication:
+    jwt_secret: ${JWT_SECRET}
+    token_expiry: 3600  # seconds

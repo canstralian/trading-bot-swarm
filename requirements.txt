@@ -1,0 +1,79 @@
+# Core Python Libraries
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Trading and Financial Data
+ccxt>=4.0.0              # Cryptocurrency exchange integration
+yfinance>=0.2.18         # Yahoo Finance data
+ta-lib>=0.4.25           # Technical analysis library
+python-binance>=1.0.15   # Binance API
+alpaca-trade-api>=3.0.0  # Alpaca trading API
+
+# Data Analysis and Machine Learning
+scikit-learn>=1.3.0
+tensorflow>=2.13.0
+torch>=2.0.0
+plotly>=5.15.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web and API
+requests>=2.31.0
+aiohttp>=3.8.0
+websocket-client>=1.6.0
+fastapi>=0.100.0
+uvicorn>=0.23.0
+
+# Database
+sqlite3
+redis>=4.6.0
+pymongo>=4.4.0
+sqlalchemy>=2.0.0
+
+# Configuration and Environment
+python-dotenv>=1.0.0
+pydantic>=2.0.0
+pyyaml>=6.0
+configparser>=5.3.0
+
+# Async and Concurrency
+asyncio
+aiofiles>=23.0.0
+celery>=5.3.0
+
+# Networking and Communication
+zmq>=25.1.0             # ZeroMQ for inter-bot communication
+flask>=2.3.0
+socketio>=5.8.0
+
+# Raspberry Pi Specific
+RPi.GPIO>=0.7.1          # GPIO control
+gpiozero>=1.6.2          # GPIO zero library
+adafruit-circuitpython-busdevice>=5.2.0
+psutil>=5.9.0            # System monitoring
+
+# Monitoring and Logging
+prometheus-client>=0.17.0
+grafana-api>=1.0.3
+loguru>=0.7.0
+
+# Security and Authentication
+cryptography>=41.0.0
+pyjwt>=2.8.0
+bcrypt>=4.0.0
+
+# Testing and Development
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.7.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Utilities
+schedule>=1.2.0          # Task scheduling
+click>=8.1.0             # CLI interface
+rich>=13.5.0             # Rich terminal output
+tqdm>=4.65.0             # Progress bars
+python-dateutil>=2.8.0
+pytz>=2023.3
