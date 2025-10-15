@@ -1,11 +1,16 @@
 # Trading Bot Swarm
 
 [![CI](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml)
-[![Docker](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![CodeQL Analysis](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml)
+[![Docker Build](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml)
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000?logo=python&logoColor=white)](https://github.com/psf/black)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/github/actions/workflow/status/canstralian/trading-bot-swarm/tests.yml?label=Tests&logo=pytest&logoColor=white)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/canstralian/trading-bot-swarm?label=Coverage&logo=codecov&logoColor=white)](https://codecov.io/gh/canstralian/trading-bot-swarm)
+[![Docs](https://img.shields.io/badge/Docs-Available-green?logo=readthedocs&logoColor=white)](https://canstralian.github.io/trading-bot-swarm)
+[![Security Scans](https://img.shields.io/badge/Security-Passed-success?logo=dependabot&logoColor=white)](https://github.com/canstralian/trading-bot-swarm/security)
+[![Container Size](https://img.shields.io/docker/image-size/canstralian/trading-bot-swarm/latest?logo=docker&logoColor=white)](https://hub.docker.com/r/canstralian/trading-bot-swarm)
 
 A sophisticated, multi-bot platform for orchestrating automated trading strategies across various cryptocurrency exchanges. This system is designed for scalability, allowing a "swarm" of bots to operate independently while being managed and monitored from a central point.
 
