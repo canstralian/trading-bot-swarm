@@ -1,132 +1,57 @@
----
+# Using GitHub Copilot with the Trading-Bot-Swarm Project
 
-# **Copilot Instructions for Trading-Bot-Swarm**
-
-## **Purpose**
-
-This document provides guidance for developers and contributors on effectively using **GitHub Copilot** within the `trading-bot-swarm` project. Copilot can assist in generating code, suggesting improvements, and accelerating development workflows, particularly for writing trading strategies, bot orchestration logic, and integration scripts.
-
-**Intended Audience:**
-
-* Developers familiar with Python, asynchronous programming, and trading bot concepts.
-* Contributors looking to enhance code productivity and maintain best practices while using Copilot.
+Welcome to the `trading-bot-swarm` repository! This document provides instructions and best practices for using GitHub Copilot to contribute to this project. Following these guidelines will help streamline your development process, improve code quality, and ensure effective collaboration.
 
 ---
 
-## **1. Overview**
+## Overview
 
-`trading-bot-swarm` is a multi-bot trading system designed to execute algorithmic trades across multiple exchanges and strategies. Copilot can help by:
+The **Trading-Bot-Swarm** project aims to develop a decentralized network of autonomous trading bots that can share intelligence and adapt their strategies collectively. The core is built in Python and leverages various data science, machine learning, and exchange connectivity libraries.
 
-* Suggesting bot behavior implementations.
-* Generating API integration code for exchanges.
-* Assisting with testing scripts and monitoring dashboards.
-
----
-
-## **2. Setup Instructions**
-
-### 2.1 Prerequisites
-
-* GitHub account with **Copilot subscription**.
-* Local development environment:
-
-  * Python 3.11+
-  * Node.js (for any dashboard scripts)
-  * Docker (optional, for containerized bot nodes)
-
-### 2.2 Installation
-
-1. **Enable Copilot in VS Code**:
-
-   * Install the **GitHub Copilot** extension from the VS Code marketplace.
-   * Sign in using your GitHub credentials.
-
-2. **Enable Copilot in the Repository**:
-
-   * Navigate to the repository in VS Code.
-   * Ensure Copilot is active (look for the Copilot icon in the bottom status bar).
-   * Optionally configure suggestions via `File > Preferences > Settings > GitHub Copilot`.
-
-3. **Configure Permissions**:
-
-   * Grant Copilot access to the repository for inline suggestions.
-   * Ensure network permissions allow VS Code to communicate with GitHub Copilot services.
+GitHub Copilot is an AI-powered pair programmer that can significantly accelerate development by suggesting code, completing functions, and even generating entire modules. Within this project, Copilot can assist with:
+* **Developing Trading Strategies:** Scaffolding new strategy classes and technical indicators.
+* **Writing Data Connectors:** Generating boilerplate code for connecting to new exchange APIs.
+* **Building Backtesting Logic:** Creating functions for performance analysis and simulation.
+* **Improving Code Quality:** Adding documentation, type hints, and unit tests.
 
 ---
 
-## **3. Usage Guidelines**
+## Setup Instructions
 
-### 3.1 Inline Suggestions
+To get started with Copilot in this project, follow these steps:
 
-* Start typing function signatures, comments, or docstrings; Copilot will suggest code completions.
-* Example:
+1.  **Install the Extension:** Make sure you have the GitHub Copilot extension installed in your IDE (e.g., VS Code, JetBrains). You can typically find it in your editor's extension marketplace.
+    
 
+2.  **Authenticate Your Account:** After installation, you'll be prompted to sign in to your GitHub account to authorize Copilot. Ensure the account has an active Copilot subscription.
+
+3.  **Enable for the Project:** Copilot should be enabled by default. You can confirm its status by looking for the Copilot icon in your IDE's status bar. Clicking it allows you to enable or disable suggestions globally or for specific languages.
+
+4.  **Provide Project Context:** For the best suggestions, open the project's root folder in your IDE. Copilot works best when it has context from the entire repository, especially from core modules like `/core`, `/strategies`, and `/connectors`.
+
+---
+
+## Usage Guidelines
+
+To maximize Copilot's effectiveness, use clear comments and descriptive function names. Here are some common use cases specific to this project.
+
+### Generating Trading Strategies
+
+When creating a new strategy in the `/strategies` directory, start with a detailed comment or a class definition.
+
+**Example:**
 ```python
-# Define a function to fetch the current BTC price from Binance
-async def fetch_btc_price():
-```
+# In /strategies/rsi_momentum_strategy.py
 
-* Copilot may suggest the implementation automatically.
+# A trading strategy class that inherits from the BaseStrategy.
+# It should implement the following logic:
+# 1. Calculate the 14-period Relative Strength Index (RSI).
+# 2. Generate a 'buy' signal when RSI crosses below 30.
+# 3. Generate a 'sell' signal when RSI crosses above 70.
+# 4. Use the `ccxt` library for data fetching.
 
-### 3.2 Code Generation
+import pandas as pd
+from strategies.base_strategy import BaseStrategy
 
-* Use Copilot for repetitive tasks like:
-
-  * API request handling
-  * Data transformations
-  * Logging and error handling
-
-### 3.3 Testing Support
-
-* Generate unit tests for trading logic:
-
-```python
-# Test if strategy triggers correctly
-def test_momentum_strategy_signal():
-```
-
-* Copilot can draft test cases based on existing logic.
-
-### 3.4 Maximizing Copilot
-
-* Write descriptive comments before functions to improve suggestion accuracy.
-* Accept, modify, or reject suggestions thoughtfully — Copilot is a helper, not a replacement for code review.
-
----
-
-## **4. Troubleshooting**
-
-| Issue                                | Solution                                                                   |
-| ------------------------------------ | -------------------------------------------------------------------------- |
-| Copilot not suggesting code          | Ensure extension is installed, signed in, and repository access is enabled |
-| Suggestions incorrect or irrelevant  | Provide more descriptive comments or function docstrings                   |
-| Network errors                       | Verify internet connection and firewall settings for VS Code               |
-| Conflicts with existing linter rules | Configure `.editorconfig` and `.pylintrc` to align with project style      |
-
-**Additional Resources:**
-
-* [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
-* [VS Code Copilot Extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
-
----
-
-## **5. Best Practices**
-
-* **Review Generated Code:** Always manually review suggestions before merging.
-* **Maintain Security:** Do not allow Copilot to suggest secrets, keys, or credentials.
-* **Collaborate with Comments:** Use clear function and module comments to improve Copilot accuracy.
-* **Code Review Integration:** Pair Copilot usage with PR reviews to catch logic errors.
-* **Incremental Adoption:** Use Copilot for scaffolding and boilerplate code rather than critical algorithm logic until verified.
-
----
-
-## **6. Optional Enhancements**
-
-* **Screenshots & Diagrams:** Include diagrams of bot architecture to guide Copilot in suggesting structured code.
-* **Template Files:** Maintain templates for trading strategies or bot node scripts to help Copilot align with project patterns.
-
----
-
-**Note:** This document should be periodically updated to reflect new Copilot features and updates in the `trading-bot-swarm` codebase.
-
----
+class RsiMomentumStrategy(BaseStrategy):
+    # Let Copilot complete the rest...
