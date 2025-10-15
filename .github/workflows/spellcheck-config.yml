@@ -1,0 +1,22 @@
+matrix:
+- name: Markdown
+  expect_match: false
+  aspell:
+    lang: en
+  dictionary:
+    encoding: utf-8
+    wordlists:
+    - .github/workflows/wordlist.txt
+  pipeline:
+  - pyspelling.filters.markdown:
+      markdown_extensions:
+      - markdown.extensions.extra:
+  - pyspelling.filters.html:
+      comments: false
+      ignores:
+      - code
+      - pre
+  sources:
+  - '**/*.md'
+  - '!node_modules/**'
+  - '!.venv/**'
