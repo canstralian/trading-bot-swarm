@@ -64,7 +64,12 @@ This runbook provides a comprehensive guide for deploying the Trading Bot Swarm 
 1. Build Docker images for Flask app and React frontend.
 2. Push images to secure container registry.
 3. Update deployment manifests (e.g., Kubernetes YAML or Docker Compose).
-4. Deploy to production environment using CI/CD pipeline (e.g., GitHub Actions, Jenkins).
+4. Deploy to production environment using CI/CD pipeline (e.g., GitHub Actions, Jenkins) with a safe rollout strategy:
+   - **Choose a rollout strategy:** Use canary, blue/green, or rolling deployment to minimize blast radius.
+   - **Canary deployment example:** Route a small percentage of traffic (e.g., 5–10%) to the new version initially.
+   - **Automated smoke tests:** Run automated smoke tests against the canary/blue environment to validate core functionality (API health, trading bot orchestration, database connectivity).
+   - **Approval gates:** Require manual approval from the team before promoting the deployment to 100% traffic.
+   - **Monitor:** Continuously monitor application metrics and error rates during rollout. Roll back if issues are detected.
 
 ### Database Deployment
 - Apply schema migrations safely:
