@@ -1154,8 +1154,6 @@ kubectl logs -f deployment/trading-bot-swarm
 
 ### 7.6 Third-Party Integrations
 
-### 7.6 Third-Party Integrations
-
 - [ ] Configure Datadog/New Relic/Prometheus for metrics
 - [ ] Set up PagerDuty/Opsgenie for on-call rotation
 - [ ] Enable Sentry/Rollbar for error tracking
