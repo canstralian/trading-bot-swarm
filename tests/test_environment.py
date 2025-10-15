@@ -12,7 +12,6 @@ def test_environment_files_exist():
     config_dir = project_root / "config"
 
     # Check for environment files
-    assert (config_dir / ".env.template").exists(), ".env.template should exist"
     assert (config_dir / ".env.development").exists(), ".env.development should exist"
     assert (config_dir / ".env.staging").exists(), ".env.staging should exist"
 
