@@ -1,0 +1,65 @@
+# Prometheus configuration for monitoring trading bot swarm
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'trading-bot-staging'
+    environment: 'staging'
+
+# Alertmanager configuration (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Trading bot application metrics
+  - job_name: 'trading-bot'
+    static_configs:
+      - targets: ['trading-bot-staging:8000']
+        labels:
+          service: 'trading-bot'
+          environment: 'staging'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # PostgreSQL metrics (if postgres_exporter is configured)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-staging:9187']
+        labels:
+          service: 'postgres'
+          environment: 'staging'
+    scrape_interval: 30s
+
+  # Redis metrics (if redis_exporter is configured)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-staging:9121']
+        labels:
+          service: 'redis'
+          environment: 'staging'
+    scrape_interval: 30s
+
+  # Node exporter for system metrics (if configured)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node'
+          environment: 'staging'
+    scrape_interval: 30s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+          environment: 'staging'

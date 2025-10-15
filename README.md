@@ -48,48 +48,220 @@ This project is built with a modern Python stack, including:
 
 *   Python 3.12 or higher
 *   Git
+*   Docker and Docker Compose (optional, for containerized deployment)
 
-### Installation
+## Development Environment Setup
+
+The development environment is designed for local testing and debugging with minimal setup.
+
+### Quick Start (Development)
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
+    git clone https://github.com/canstralian/trading-bot-swarm.git
     cd trading-bot-swarm
     ```
 
 2.  **Create and activate a virtual environment:**
     ```bash
     python3 -m venv .venv
-    source .venv/bin/activate
+    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
     ```
 
-3.  **Install the dependencies:**
+3.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt
+    pip install -r requirements-dev.txt  # Development tools
     ```
 
-4.  **Set up the configuration:**
-    *   Copy the environment template: `cp config/.env.template config/.env`
-    *   Edit `config/.env` to add your API keys and other secrets.
-    *   Review and customize `config/config.yaml` for your trading strategies and bot configurations.
+4.  **Set up development configuration:**
+    ```bash
+    # Use the pre-configured development environment
+    cp config/.env.development config/.env
+    # Edit config/.env with your testnet API keys (optional)
+    ```
+
+5.  **Run the application in development mode:**
+    ```bash
+    python main.py --env development
+    ```
+
+### Development Features
+
+*   **Database:** Uses SQLite (`data/trading_bot_dev.db`) - no external database required
+*   **Debug Mode:** Enabled with verbose logging (`LOG_LEVEL=DEBUG`)
+*   **Test Mode:** Safe trading with testnet/paper trading APIs
+*   **Hot Reload:** Code changes are reflected immediately
+*   **Testing:** Integrated with pytest and coverage reporting
+
+### Running Tests
+
+```bash
+# Run all tests with coverage
+pytest
+
+# Run specific test file
+pytest tests/test_environment.py
+
+# Run with verbose output
+pytest -v
+
+# Generate HTML coverage report
+pytest --cov=src --cov-report=html
+```
+
+### Code Quality Tools
+
+```bash
+# Format code with Black
+black .
+
+# Check code style
+flake8 .
+
+# Type checking
+mypy src/
+
+# Run all quality checks
+black --check . && flake8 . && mypy src/
+```
+
+## Staging Environment Setup
+
+The staging environment mimics production for final testing before deployment.
+
+### Prerequisites for Staging
+
+*   Linux server (Ubuntu 20.04+ recommended)
+*   Docker and Docker Compose installed
+*   PostgreSQL 15+
+*   Redis 7+
+*   Nginx (for reverse proxy)
+*   Access to staging server via SSH
+
+### Staging Deployment
+
+#### Manual Deployment
+
+1.  **Prepare the server:**
+    ```bash
+    # On your staging server
+    sudo apt-get update
+    sudo apt-get install -y docker.io docker-compose nginx
+    sudo systemctl enable docker
+    sudo systemctl start docker
+    ```
+
+2.  **Clone and configure:**
+    ```bash
+    cd /opt
+    sudo git clone https://github.com/canstralian/trading-bot-swarm.git
+    cd trading-bot-swarm
+    
+    # Set up staging environment variables
+    sudo cp config/.env.staging config/.env
+    # Edit config/.env with your staging credentials
+    sudo nano config/.env
+    ```
+
+3.  **Deploy with Docker Compose:**
+    ```bash
+    sudo docker-compose -f docker-compose.staging.yml up -d
+    ```
+
+4.  **Verify deployment:**
+    ```bash
+    sudo docker-compose -f docker-compose.staging.yml ps
+    curl http://localhost:8080/health
+    ```
+
+#### Automated Deployment via GitHub Actions
+
+The project includes automated staging deployment via GitHub Actions.
+
+**Setup Required Secrets:**
+
+In your GitHub repository settings, add these secrets:
+
+*   `STAGING_HOST` - Staging server hostname/IP
+*   `STAGING_USER` - SSH username
+*   `STAGING_SSH_KEY` - SSH private key for deployment
+*   `STAGING_PORT` - SSH port (default: 22)
+*   `STAGING_POSTGRES_HOST` - PostgreSQL host
+*   `STAGING_POSTGRES_USER` - PostgreSQL username
+*   `STAGING_POSTGRES_PASSWORD` - PostgreSQL password
+*   `STAGING_REDIS_HOST` - Redis host
+*   `STAGING_REDIS_PASSWORD` - Redis password
+*   `STAGING_SENTRY_DSN` - Sentry DSN for error tracking
+*   `DOCKER_USERNAME` - Docker Hub username
+*   `DOCKER_PASSWORD` - Docker Hub password
+
+**Deployment Trigger:**
+
+Push to `develop` or `staging` branches triggers automatic deployment:
+
+```bash
+git push origin develop
+```
+
+### Staging Features
+
+*   **Database:** PostgreSQL with connection pooling
+*   **Caching:** Redis for session and data caching
+*   **Web Server:** Gunicorn with multiple workers
+*   **Reverse Proxy:** Nginx for load balancing and SSL
+*   **Monitoring:** Prometheus + Grafana dashboards
+*   **Error Tracking:** Sentry integration for real-time error monitoring
+*   **Logging:** Centralized logging with rotation
+*   **CI/CD:** Automated testing and deployment
+
+### Monitoring Staging Environment
+
+Access monitoring tools:
+
+*   **Application:** `http://your-staging-server:8080`
+*   **Prometheus:** `http://your-staging-server:9090`
+*   **Grafana:** `http://your-staging-server:3000` (default: admin/admin)
+*   **Logs:** `docker-compose -f docker-compose.staging.yml logs -f`
+
+### Staging Configuration
+
+Key staging settings in `config/.env.staging`:
+
+*   Uses PostgreSQL for database (production-like)
+*   Gunicorn with 4 workers and 2 threads
+*   Sentry error tracking enabled
+*   Prometheus metrics collection enabled
+*   Debug mode disabled
+*   Paper trading mode (safe for testing)
 
 ## Usage
 
-To run the main application, execute the `main.py` script:
+### Running in Different Environments
 
 ```bash
-python main.py
+# Development (default)
+python main.py --env development
+
+# Staging
+python main.py --env staging
+
+# Production
+python main.py --env production
+
+# Monitoring mode only (no trading)
+python main.py --env development --no-trading
 ```
 
-Make sure to configure your bots and strategies in the `config/config.yaml` file before running the application.
+### Configuration
 
-## Testing
+Environment-specific configurations are managed through:
 
-To run the test suite, use `pytest`:
+*   `config/.env.development` - Development environment variables
+*   `config/.env.staging` - Staging environment variables
+*   `config/config.yaml` - Shared application configuration
 
-```bash
-pytest
-```
+Make sure to review and customize these files for your trading strategies and bot configurations.
 
 ## Project Structure
 

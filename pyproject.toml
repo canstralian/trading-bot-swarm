@@ -62,8 +62,8 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 ignore_missing_imports = true
 exclude = [
-    "\.venv",
-    "\.git",
+    "\\.venv",
+    "\\.git",
     "__pycache__",
     "build",
     "dist"
@@ -102,7 +102,7 @@ exclude_lines = [
     "raise NotImplementedError",
     "if 0:",
     "if False:",
-    "class .*\\bProtocol\\):",
+    "class .*\\(Protocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
 
