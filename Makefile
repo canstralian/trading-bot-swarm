@@ -1,4 +1,4 @@
-.PHONY: help install install-dev clean test lint format security check all run docker-build docker-run
+.PHONY: help install install-dev clean test lint format security check all run docker-build docker-run setup-dev setup-staging
 
 # Default target
 help:
@@ -8,6 +8,8 @@ help:
 	@echo "Setup:"
 	@echo "  make install        Install production dependencies"
 	@echo "  make install-dev    Install development dependencies"
+	@echo "  make setup-dev      Complete development environment setup"
+	@echo "  make setup-staging  Deploy to staging environment"
 	@echo ""
 	@echo "Code Quality:"
 	@echo "  make format         Format code with black and isort"
@@ -18,14 +20,17 @@ help:
 	@echo "Testing:"
 	@echo "  make test           Run tests with pytest"
 	@echo "  make test-cov       Run tests with coverage report"
+	@echo "  make test-env       Run environment configuration tests"
 	@echo ""
 	@echo "Application:"
 	@echo "  make run            Run the trading bot"
 	@echo "  make run-dev        Run in development mode"
+	@echo "  make run-staging    Run in staging mode"
 	@echo ""
 	@echo "Docker:"
 	@echo "  make docker-build   Build Docker image"
 	@echo "  make docker-run     Run Docker container"
+	@echo "  make docker-staging Deploy staging with docker-compose"
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  make clean          Clean build artifacts and cache"
@@ -36,10 +41,20 @@ install:
 	pip install -r requirements.txt
 
 install-dev: install
+	pip install -r requirements-dev.txt
 	pip install black flake8 mypy pytest pytest-asyncio pytest-cov
 	pip install bandit safety pip-audit pre-commit
 	pip install isort
 	pre-commit install
+
+# Environment setup
+setup-dev:
+	@echo "Setting up development environment..."
+	@bash scripts/setup-dev.sh
+
+setup-staging:
+	@echo "Deploying to staging environment..."
+	@bash scripts/deploy-staging.sh
 
 # Code formatting
 format:
@@ -76,12 +91,19 @@ test-cov:
 	pytest tests/ -v --cov=src --cov-report=term-missing --cov-report=html
 	@echo "Coverage report generated in htmlcov/index.html"
 
+test-env:
+	@echo "Running environment configuration tests..."
+	pytest tests/test_environment.py -v
+
 # Run application
 run:
 	python main.py
 
 run-dev:
 	python main.py --env development
+
+run-staging:
+	python main.py --env staging
 
 run-prod:
 	python main.py --env production
@@ -92,6 +114,21 @@ docker-build:
 
 docker-run:
 	docker run -it --rm trading-bot-swarm:latest
+
+docker-staging:
+	@echo "Starting staging environment with Docker Compose..."
+	docker-compose -f docker-compose.staging.yml up -d
+	@echo "Services started. Access at:"
+	@echo "  Application: http://localhost:8080"
+	@echo "  Prometheus: http://localhost:9090"
+	@echo "  Grafana: http://localhost:3000"
+
+docker-staging-stop:
+	@echo "Stopping staging environment..."
+	docker-compose -f docker-compose.staging.yml down
+
+docker-staging-logs:
+	docker-compose -f docker-compose.staging.yml logs -f
 
 # Cleanup
 clean:
