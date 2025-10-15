@@ -80,7 +80,7 @@ services:
     networks:
       - trading-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a $${STAGING_REDIS_PASSWORD} ping"]
       interval: 10s
       timeout: 3s
       retries: 5
