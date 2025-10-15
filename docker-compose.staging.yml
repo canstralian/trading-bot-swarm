@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   trading-bot-staging:
-    image: ${DOCKER_USERNAME}/trading-bot-swarm:staging
+    image: ${DOCKER_USERNAME:-your_dockerhub_user}/trading-bot-swarm:staging
     container_name: trading-bot-staging
     restart: unless-stopped
     environment:
