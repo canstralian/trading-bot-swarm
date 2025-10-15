@@ -78,9 +78,9 @@ This runbook provides a comprehensive guide for deploying the Trading Bot Swarm 
 ## Health Checks
 
 ### Automated Health Checks
-- Implement `/health` endpoint in Flask app returning system status.
-- Check database connectivity and response times.
-- Monitor bot orchestration processes.
+- Implement a minimal `/health` endpoint in the Flask app that returns basic liveness status (e.g., "OK") with no sensitive details.
+- Move dependency checks (e.g., database connectivity, bot orchestration processes) to a `/ready` endpoint, which should be restricted to internal networks or require authentication.
+- Avoid returning detailed error messages or configuration values in health responses.
 
 ### Manual Verification
 - Access application dashboard.
