@@ -67,7 +67,12 @@ This runbook provides a comprehensive guide for deploying the Trading Bot Swarm 
 4. Deploy to production environment using CI/CD pipeline (e.g., GitHub Actions, Jenkins).
 
 ### Database Deployment
-- Apply schema migrations safely.
+- Apply schema migrations safely:
+  - Run migrations inside transactions where supported to ensure atomicity and easy rollback.
+  - Use the expand-and-contract pattern for backward-compatible, zero-downtime schema changes (e.g., add new columns/tables, migrate data, then remove old columns).
+  - Ensure migration scripts are idempotent so they can be safely re-run.
+  - Perform a dry-run of migrations in staging to validate changes and catch errors.
+  - Document and prepare a clear rollback procedure in case migrations fail (e.g., restore from backup, revert schema changes).
 - Update connection strings in application configs.
 - Verify database connectivity from application servers.
 
