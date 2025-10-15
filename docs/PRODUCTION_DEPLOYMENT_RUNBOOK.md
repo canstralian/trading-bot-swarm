@@ -15,7 +15,7 @@ This runbook provides a comprehensive guide for deploying the Trading Bot Swarm 
 
 ### Dependency Updates
 - Update all Python dependencies to latest secure versions using `pip-audit`.
-- Update Node.js packages with `npm audit fix`.
+- Run `npm audit` to identify vulnerabilities, then apply controlled, pinned dependency updates. Prefer manual updates with CI validation, or use automated scanners (e.g., Dependabot, Snyk) with review gates. Avoid using `npm audit fix` directly, as it can introduce breaking upgrades; if necessary, use `npm audit fix --only=prod` for production dependencies only.
 - Ensure PostgreSQL version is up-to-date and compatible.
 
 ### Configuration Management
