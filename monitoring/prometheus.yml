@@ -48,13 +48,13 @@ scrape_configs:
     scrape_interval: 30s
 
   # Node exporter for system metrics (if configured)
-  - job_name: 'node'
-    static_configs:
-      - targets: ['node-exporter:9100']
-        labels:
-          service: 'node'
-          environment: 'staging'
-    scrape_interval: 30s
+  # - job_name: 'node'
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'node'
+  #         environment: 'staging'
+  #   scrape_interval: 30s
 
   # Prometheus self-monitoring
   - job_name: 'prometheus'
