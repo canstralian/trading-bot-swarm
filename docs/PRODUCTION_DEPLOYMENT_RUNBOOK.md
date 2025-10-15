@@ -27,6 +27,7 @@ This runbook provides a comprehensive guide for deploying the Trading Bot Swarm 
 
 ### Backup and Data Migration
 - Create database backups before deployment.
+- **Verify backup restorability:** Perform a backup restore test by restoring the latest backup in the staging environment before deployment. Periodically conduct restore drills to ensure backup integrity.
 - Plan for data migrations if schema changes are involved.
 - Test migration scripts in staging environment.
 
