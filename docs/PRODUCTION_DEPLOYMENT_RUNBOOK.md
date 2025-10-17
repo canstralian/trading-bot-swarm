@@ -585,10 +585,10 @@ curl -v https://api.exchange.com/ping
 
 ### F. Version History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.1 | 2025-10-15 | DevOps Team | Updated with modern tooling and best practices |
-| 1.0 | 2025-10-15 | DevOps Team | Initial version |
+| Version | Date       | Author      | Changes                                         |
+|---------|------------|-------------|-------------------------------------------------|
+| 1.1     | 2025-10-15 | DevOps Team | Updated with modern tooling and best practices   |
+| 1.0     | 2025-10-15 | DevOps Team | Initial version                                 |
 
 ---
 
