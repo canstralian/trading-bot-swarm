@@ -83,6 +83,41 @@ python main.py
 
 Make sure to configure your bots and strategies in the `config/config.yaml` file before running the application.
 
+### Working with Local LLM Assistants
+
+Some traders enhance their research workflows with lightweight language models that run locally for idea generation or report summarization. If you would like to experiment with this approach, you can load a quantized [GGUF](https://github.com/ggerganov/ggml/blob/master/docs/gguf.md) model from Hugging Face using [`llama-cpp-python`](https://github.com/abetlen/llama-cpp-python):
+
+```python
+!pip install llama-cpp-python huggingface_hub
+
+from llama_cpp import Llama
+from huggingface_hub import hf_hub_download
+
+# Download the GGUF model from Hugging Face
+model_path = hf_hub_download(
+    repo_id="GGUF-A-Lot/DeepHat-V1-7B-GGUF",
+    filename="DeepHat-V1-7B-Q4_K_M.gguf"
+)
+
+# Load the model
+llm = Llama(model_path=model_path, n_ctx=4096, n_threads=8)
+
+# Run an inference
+output = llm(
+    "Write a concise summary of DeepHat’s intended architecture and training goals.",
+    max_tokens=256,
+    temperature=0.7,
+)
+print(output["choices"][0]["text"])
+```
+
+**Tips:**
+
+* `hf_hub_download` retrieves the `.gguf` artifact directly into your environment so it can be reused across sessions.
+* `Llama(model_path=...)` is the correct constructor signature for quantized models downloaded from the Hub.
+* Tune `n_ctx` (context window) and `n_threads` to fit your hardware capabilities.
+* On Windows or Replit you may need a BLAS backend (for example, OpenBLAS). On Apple Silicon, `llama-cpp-python` automatically uses Metal if available.
+
 ## Testing
 
 To run the test suite, use `pytest`:
