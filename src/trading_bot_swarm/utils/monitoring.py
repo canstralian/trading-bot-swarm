@@ -117,7 +117,7 @@ class SystemMonitor:
         if not overrides:
             return AlertThresholds()
 
-        allowed_keys = {field.name for field in AlertThresholds.__dataclass_fields__.values()}
+        allowed_keys = {field.name for field in __import__("dataclasses").fields(AlertThresholds)}
         filtered = {k: v for k, v in overrides.items() if k in allowed_keys}
         return AlertThresholds(**filtered)
 
