@@ -1,118 +1,82 @@
 # Trading Bot Swarm
 
-[![CI](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml)
-[![CodeQL Analysis](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml)
-[![Docker Build](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml)
-[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Code Style: Black](https://img.shields.io/badge/Code%20Style-Black-000000?logo=python&logoColor=white)](https://github.com/psf/black)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/github/actions/workflow/status/canstralian/trading-bot-swarm/tests.yml?label=Tests&logo=pytest&logoColor=white)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/tests.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/canstralian/trading-bot-swarm?label=Coverage&logo=codecov&logoColor=white)](https://codecov.io/gh/canstralian/trading-bot-swarm)
-[![Docs](https://img.shields.io/badge/Docs-Available-green?logo=readthedocs&logoColor=white)](https://canstralian.github.io/trading-bot-swarm)
-[![Security Scans](https://img.shields.io/badge/Security-Passed-success?logo=dependabot&logoColor=white)](https://github.com/canstralian/trading-bot-swarm/security)
-[![Container Size](https://img.shields.io/docker/image-size/canstralian/trading-bot-swarm/latest?logo=docker&logoColor=white)](https://hub.docker.com/r/canstralian/trading-bot-swarm)
+[![Quality Gate](https://github.com/canstralian/trading-bot-swarm/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/quality-gate.yml)
+[![Release](https://github.com/canstralian/trading-bot-swarm/actions/workflows/release.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A sophisticated, multi-bot platform for orchestrating automated trading strategies across various cryptocurrency exchanges. This system is designed for scalability, allowing a "swarm" of bots to operate independently while being managed and monitored from a central point.
+Trading Bot Swarm is a modular Python platform for orchestrating multiple automated trading agents with shared market data, risk management, and monitoring utilities. The project is structured as a production-ready package that can be installed with `pip`, tested automatically, and published to PyPI.
 
-## Features
+## Key Capabilities
 
-*   **Multi-Bot Architecture:** Run multiple trading bots simultaneously, each with its own strategy and configuration.
-*   **Strategy Engine:** Supports a variety of trading strategies, including:
-    *   Trend Following
-    *   Mean Reversion
-    *   Momentum
-    *   (and easily extensible for more)
-*   **Centralized Orchestration:** A core engine to manage, monitor, and control the entire swarm of bots.
-*   **Market Data Analysis:** Integrates with various data sources and technical analysis libraries to inform trading decisions.
-*   **Portfolio Management:** Tracks capital, positions, and performance across all bots.
-*   **Risk Management:** Implements risk controls such as stop-loss and take-profit orders.
-*   **Extensible and Modular:** The project is structured to be easily extended with new bots, strategies, and exchange integrations.
-*   **Ready for Monitoring:** Includes support for Prometheus and Grafana for monitoring bot performance and system health.
+- **Multi-strategy orchestration** – run a swarm of specialised bots with shared market data and risk controls.
+- **Robust risk management** – portfolio-aware sizing, drawdown protections, and automated take-profit / stop-loss handling.
+- **Structured monitoring** – async system monitoring with Raspberry Pi fallbacks for edge deployments.
+- **Configurable deployments** – YAML driven configuration with encrypted secrets and environment overrides.
+- **Package-first design** – installable from PyPI, fully typed, and validated by CI quality gates.
 
-## Tech Stack
+## Repository Layout
 
-This project is built with a modern Python stack, including:
+```text
+├── config/                 # Default configuration bundles
+├── docs/                   # Operations, CI/CD, and usage guides
+├── src/                    # Installable package source code
+│   ├── bots/               # High-level bot orchestrators
+│   ├── core/               # Trading engine, risk, portfolio, config
+│   ├── strategies/         # Strategy implementations
+│   └── utils/              # Logging, monitoring, and persistence helpers
+├── tests/                  # Pytest suite and fixtures
+├── pyproject.toml          # Build metadata and dependency management
+└── Makefile                # Common development tasks
+```
 
-*   **Core:** Python 3.12+
-*   **Trading & Data:** `ccxt`, `yfinance`, `ta-lib`, `python-binance`, `alpaca-trade-api`
-*   **Web & API:** `fastapi`, `uvicorn`, `websockets`
-*   **Data Analysis & ML:** `numpy`, `pandas`, `scikit-learn`, `tensorflow`, `torch`
-*   **Database:** `redis`, `sqlalchemy` (for PostgreSQL, etc.), `sqlite3`
-*   **Async & Concurrency:** `asyncio`, `celery`, `zmq`
-*   **Testing:** `pytest`, `pytest-asyncio`
-*   **Code Quality:** `black`, `flake8`, `mypy`
-
-## Getting Started
-
-### Prerequisites
-
-*   Python 3.12 or higher
-*   Git
-
-### Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd trading-bot-swarm
-    ```
-
-2.  **Create and activate a virtual environment:**
-    ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    ```
-
-3.  **Install the dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4.  **Set up the configuration:**
-    *   Copy the environment template: `cp config/.env.template config/.env`
-    *   Edit `config/.env` to add your API keys and other secrets.
-    *   Review and customize `config/config.yaml` for your trading strategies and bot configurations.
-
-## Usage
-
-To run the main application, execute the `main.py` script:
+## Quick Start
 
 ```bash
-python main.py
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+pre-commit install
 ```
 
-Make sure to configure your bots and strategies in the `config/config.yaml` file before running the application.
-
-## Testing
-
-To run the test suite, use `pytest`:
+Configure secrets and environment specific overrides in `config/` (see [docs/CONFIGURATION.md](docs/CONFIGURATION.md)). You can then start the reference orchestrator:
 
 ```bash
-pytest
+python main.py --env development
 ```
 
-## Project Structure
+## Quality Gates
 
-```
-├── config/             # Configuration files
-├── data/               # Data files (e.g., historical data)
-├── logs/               # Log files
-├── src/                # Source code
-│   ├── bots/           # Individual trading bot implementations
-│   ├── core/           # Core components (trading engine, portfolio, etc.)
-│   ├── strategies/     # Trading strategy implementations
-│   ├── utils/          # Utility functions (database, logger)
-│   └── swarm/          # (Likely for swarm management and communication)
-├── tests/              # Test files
-├── main.py             # Main application entry point
-├── requirements.txt    # Project dependencies
-└── README.md           # This file
-```
+The repository uses reproducible automation via the `Makefile`:
+
+| Purpose          | Command                      |
+| ---------------- | ---------------------------- |
+| Format code      | `make format`                |
+| Static analysis  | `make lint` (flake8 + mypy)  |
+| Security checks  | `make security` (bandit etc) |
+| Tests + coverage | `make test-cov`              |
+
+Continuous integration (see `.github/workflows/quality-gate.yml`) runs linting, type checking, unit tests, and security audits for every code change.
+
+## Documentation
+
+- [Usage Guide](docs/USAGE_GUIDE.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Operations Runbook](docs/PRODUCTION_DEPLOYMENT_RUNBOOK.md)
+- [CI/CD Overview](docs/CI_CD.md)
+- [Release Process](docs/RELEASE_PROCESS.md)
+- [Changelog](CHANGELOG.md)
+
+## Releasing & Publishing
+
+1. Ensure `make check` and tests are green locally.
+2. Update `CHANGELOG.md` with user-facing notes.
+3. Bump the version in `pyproject.toml` (semantic versioning).
+4. Create a signed tag (`git tag -s vX.Y.Z`) and push.
+5. GitHub Actions will build wheels and publish to PyPI once the `PYPI_API_TOKEN` secret is configured.
+
+See [docs/RELEASE_PROCESS.md](docs/RELEASE_PROCESS.md) for the detailed checklist, including verification, signing, and rollout monitoring.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+We welcome issues and pull requests! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and ensure that all CI checks pass before requesting a review.

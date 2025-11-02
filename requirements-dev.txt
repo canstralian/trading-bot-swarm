@@ -1,0 +1,12 @@
+# Development dependencies for contributors and CI pipelines
+-r requirements.txt
+black>=23.7.0
+flake8>=6.0.0
+mypy>=1.5.0
+pylint>=2.17.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+bandit>=1.7.5
+pip-audit>=2.6.0
+isort>=5.12.0

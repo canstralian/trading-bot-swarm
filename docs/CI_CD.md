@@ -8,36 +8,19 @@ The project uses GitHub Actions for automated testing, security scanning, code q
 
 ## Workflows
 
-### 1. Main CI Pipeline (`ci.yml`)
+### 1. Quality Gate (`quality-gate.yml`)
 
-**Trigger:** Push to `main`/`develop`, Pull Requests
+**Trigger:** Push to `main`/`master`, Pull Requests (excluding documentation-only changes)
 
 **Jobs:**
 
-#### Code Quality
-- **Black**: Validates code formatting
-- **Flake8**: Lints code for style and logical errors
-- **MyPy**: Performs static type checking
+- **Flake8** – code style and logical linting
+- **Mypy** – static type validation
+- **Pylint** – structural quality gates (score ≥ 8 enforced locally)
+- **Pytest** – unit tests with coverage summary
+- **Bandit / pip-audit** – security scanning for source and dependencies
 
-#### Security Scanning
-- **Bandit**: Scans for common security issues in Python code
-- **Safety**: Checks for known vulnerabilities in dependencies
-- Generates security reports uploaded as artifacts
-
-#### Testing
-- **Matrix Testing**: Tests across:
-  - Python versions: 3.10, 3.11, 3.12
-  - Operating systems: Ubuntu, macOS
-- **Coverage**: Generates code coverage reports
-- **Codecov**: Uploads coverage to Codecov for tracking
-
-#### Dependency Audit
-- **pip-audit**: Audits dependencies for security vulnerabilities
-
-#### Build Validation
-- Validates project structure
-- Syntax checks all Python files
-- Generates build artifacts
+The workflow runs on Ubuntu with Python 3.12 to mirror production packaging.
 
 ### 2. CodeQL Security Analysis (`codeql.yml`)
 
@@ -94,11 +77,19 @@ docker run ghcr.io/canstralian/trading-bot-swarm:main
 - **Link Checker**: Validates all links in documentation
 - **Spell Check**: Checks spelling in documentation
 
+### 6. Release (`release.yml`)
+
+**Trigger:** Push of a semantic version tag (`v*.*.*`)
+
+**Purpose:** Build source/wheel artifacts and publish them to PyPI using the project `PYPI_API_TOKEN` secret.
+
+**Steps:** Checkout → install build tooling → `python -m build` → publish with `pypa/gh-action-pypi-publish` → generate GitHub release notes.
+
 ## CI Status Badges
 
 Current status of all workflows:
 
-[![CI](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/ci.yml)
+[![Quality Gate](https://github.com/canstralian/trading-bot-swarm/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/quality-gate.yml)
 [![CodeQL](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/codeql.yml)
 [![Docker](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml/badge.svg)](https://github.com/canstralian/trading-bot-swarm/actions/workflows/docker.yml)
 
@@ -106,7 +97,7 @@ Current status of all workflows:
 
 ### Prerequisites
 ```bash
-pip install black flake8 mypy pytest pytest-asyncio pytest-cov bandit safety pip-audit
+pip install -r requirements-dev.txt
 ```
 
 ### Code Quality
