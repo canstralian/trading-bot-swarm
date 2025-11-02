@@ -19,9 +19,9 @@ This document outlines the checklist for cutting a production release and publis
 
 - Semantic Versioning (`MAJOR.MINOR.PATCH`)
 - Increment:
-  - **MAJOR** when making incompatible API changes
-  - **MINOR** for backwards-compatible functionality
-  - **PATCH** for backwards-compatible bug fixes
+    - **MAJOR** when making incompatible API changes
+    - **MINOR** for backwards-compatible functionality
+    - **PATCH** for backwards-compatible bug fixes
 
 ## Tagging & Release
 
