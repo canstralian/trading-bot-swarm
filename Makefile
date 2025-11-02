@@ -36,9 +36,8 @@ install:
 	pip install -r requirements.txt
 
 install-dev: install
-	pip install black flake8 mypy pytest pytest-asyncio pytest-cov
-	pip install bandit safety pip-audit pre-commit
-	pip install isort
+	pip install -r requirements-dev.txt
+	pip install safety pre-commit
 	pre-commit install
 
 # Code formatting
