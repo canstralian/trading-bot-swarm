@@ -6,8 +6,8 @@ from datetime import UTC, datetime
 
 import pytest
 
-from src.core.risk_manager import PositionStatus, RiskManager
-from src.core.strategy_interface import SignalType, TradingSignal
+from trading_bot_swarm.core.risk_manager import PositionStatus, RiskManager
+from trading_bot_swarm.core.strategy_interface import SignalType, TradingSignal
 
 
 @pytest.fixture()

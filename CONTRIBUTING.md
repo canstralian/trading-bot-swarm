@@ -169,7 +169,7 @@ pytest tests/ -m "unit"
 
 ```python
 import pytest
-from src.module import function_to_test
+from trading_bot_swarm.module import function_to_test
 
 
 def test_function_basic_case():

@@ -14,11 +14,11 @@ from typing import Optional
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from src.core.config_manager import ConfigManager
-from src.core.trading_engine import TradingEngine
-from src.utils.logger import setup_logging
-from src.utils.database import DatabaseManager
-from src.utils.monitoring import SystemMonitor
+from trading_bot_swarm.core.config_manager import ConfigManager
+from trading_bot_swarm.core.trading_engine import TradingEngine
+from trading_bot_swarm.utils.logger import setup_logging
+from trading_bot_swarm.utils.database import DatabaseManager
+from trading_bot_swarm.utils.monitoring import SystemMonitor
 
 
 class NOICETradingBot:
