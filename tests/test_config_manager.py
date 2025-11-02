@@ -8,7 +8,7 @@ from typing import Dict
 import pytest
 from cryptography.fernet import Fernet
 
-from src.core.config_manager import ConfigManager
+from trading_bot_swarm.core.config_manager import ConfigManager
 
 
 @pytest.fixture()
